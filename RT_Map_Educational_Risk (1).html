@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+  <meta charset='utf-8' />
+  <title>RT Specialty | Educational Risk – Location Map</title>
+  <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+  <link rel='stylesheet' href='https://unpkg.com/leaflet@1.9.4/dist/leaflet.css'/>
+  <link rel='stylesheet' href='https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css'/>
+  <link rel='stylesheet' href='https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css'/>
+  <style>
+    body { margin: 0; font-family: Arial, Helvetica, sans-serif; }
+    #map { height: 100vh; }
+    .popup-title { font-weight: bold; font-size: 14px; margin-bottom: 4px; }
+    .popup-line { font-size: 12px; }
+  </style>
+</head>
+<body>
+<div id='map'></div>
+<script src='https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'></script>
+<script src='https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js'></script>
+<script>
+const map = L.map('map').setView([37.5, -119.5], 6);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap contributors' }).addTo(map);
+const markers = L.markerClusterGroup();
+const locations = [
+ {name:'Bentley School',address:'1 Hiller Drive, Oakland, CA 94618',tiv:'$21,389,998',wf:'79'},
+ {name:'Chartwell School',address:'2511 Numa Watson Road, Seaside, CA 93955',tiv:'$16,096,600',wf:'62'},
+ {name:'Crane Country Day School',address:'1795 San Leandro Lane, Santa Barbara, CA 93108',tiv:'$35,912,745',wf:'32'},
+ {name:'Dunn School',address:'2555 West Highway 154, Los Olivos, CA 93441',tiv:'$76,034,168',wf:'50'},
+ {name:'Idyllwild Arts Foundation',address:'52500 Temecula Rd, Idyllwild, CA 92549',tiv:'$102,508,869',wf:'100'},
+ {name:'IOTA Community Schools',address:'4088 Ross Road, Memphis, TN 38115',tiv:'$45,784,319',wf:'N/A'},
+ {name:'Midland School Corporation',address:'5100 Figueroa Mountain Rd., Los Olivos, CA 93441',tiv:'$17,982,950',wf:'66'},
+ {name:'Robert Louis Stevenson School – Carmel',address:'24800 Dolores Street, Carmel, CA 93953',tiv:'$18,343,483',wf:'71'},
+ {name:'Western Christian Schools – Claremont',address:'3105 Padua Avenue, Claremont, CA 91711',tiv:'$20,384,547',wf:'77'},
+ {name:'Westland School, Inc.',address:'16200 Mulholland Drive, Los Angeles, CA 90049',tiv:'$6,666,753',wf:'69'},
+ {name:'Woodside Priory School',address:'302 Portola Road, Portola Valley, CA 94028',tiv:'$100,148,863',wf:'36'},
+ {name:'York School',address:'9501 York Road, Monterey, CA 93940',tiv:'$29,672,605',wf:'69'},
+ {name:'Viewpoint Educational Foundation',address:'23620 Mulholland Highway, Calabasas, CA 91302',tiv:'$124,075,707',wf:'82'}
+];
+locations.forEach(loc => {
+ fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(loc.address)}`)
+  .then(r=>r.json()).then(d=>{
+   if(d.length){
+    const popup = `<div class='popup-title'>${loc.name}</div>`+
+    `<div class='popup-line'>${loc.address}</div>`+
+    `<div class='popup-line'><b>TIV:</b> ${loc.tiv}</div>`+
+    `<div class='popup-line'><b>WF Score:</b> ${loc.wf}</div>`;
+    const m=L.marker([d[0].lat,d[0].lon]).bindPopup(popup);
+    markers.addLayer(m); map.addLayer(markers); map.fitBounds(markers.getBounds());
+   }
+ });
+});
+</script>
+</body>
+</html>
